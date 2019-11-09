@@ -1,0 +1,16 @@
+table, th, td {
+    border: 1px solid black;
+}
+
+form {
+    margin-top: 40px;
+}
+
+.awesome-form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.submit-button {
+    margin-top: 20px;
+}
