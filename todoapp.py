@@ -18,11 +18,19 @@ def submit():
     if('Incorrect' in validations.values()):
         return render_template_string(invalid_form_template(), form=validations)
     
-    write_to_file(dict_form_values)
+    append_to_file(dict_form_values)
 
     return redirect(url_for('index'))
 
-def write_to_file(form_values):
+@app.route('/clear')
+def clear():
+    with open('todo-list.json', 'w') as file:
+        json.dump([], file)
+        
+    return redirect(url_for('index'))
+    
+
+def append_to_file(form_values):
     todo_list = read_todo_file()
     append_value = [*todo_list, form_values]
 
