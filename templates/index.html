@@ -5,20 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css')}}?bust={{cache_bust}}">
 </head>
 <body>
     <h1>My Awesome Todo List</h1>
+    <div>
+        <form>
+            <div class="awesome-form">
+                <div>
+                    <span>Task:</span>
+                    <input type="text" name="task" required>
+                </div>
+                <div>
+                    <span>Email:</span>
+                    <input type="text" name="task" required>
+                </div>
+
+                <select name="prioritylist" required>
+                    <option value="">None</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+            <button class='submit-button'>Add To Do Item</button>
+        </form>
+    </div>
+
+    <div>
+        <h2>Todos:</h2>
+    </div>
     <table>
         <tr>
             <th>Task</th>
             <th>Email</th>
             <th>Priority</th>
+            <!-- <th>Mark Complete</th> -->
         </tr>
         {% for todo in todo_list %}
         <tr>
             <td>{{ todo.task }}</td>
             <td>{{ todo.email }}</td>
             <td>{{ todo.priority }}</td>
+            <!-- <td><button>Complete</button></td> -->
         </tr>
         {% endfor %}  
     </table>
