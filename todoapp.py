@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string
-import random, re, json
+import random, re, json, uuid
 
 app = Flask(__name__)
 
@@ -13,12 +13,13 @@ def index():
 def submit():
     form_values = request.form
     dict_form_values = dict(form_values)
+    uuid_dict = {'uuid': str(uuid.uuid1())}
     validations = run_validations(dict_form_values)
   
     if('Incorrect' in validations.values()):
         return render_template_string(invalid_form_template(), form=validations)
-    
-    append_to_file(dict_form_values)
+
+    append_to_file({**dict_form_values, **uuid_dict})
 
     return redirect(url_for('index'))
 
@@ -26,7 +27,7 @@ def submit():
 def clear():
     with open('todo-list.json', 'w') as file:
         json.dump([], file)
-        
+
     return redirect(url_for('index'))
     
 
