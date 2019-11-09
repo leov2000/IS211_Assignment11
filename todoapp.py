@@ -1,15 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string
-import random, re
+import random, re, json
 
 app = Flask(__name__)
 
 @app.route('/')
 def index():
-    todo_list =  [
-        {'id': 1, 'task': 'get cheese', 'email': 'bluecheesee123@gmail.com', 'priority': 'Hard'},
-        {'id': 2, 'task': 'get milk', 'email': 'cable@gmail.com', 'priority': 'Low'},
-        {'id': 3, 'task': 'take out trash', 'email': 'ce123@gmail.com', 'priority': 'Medium'}
-    ]
+    todo_list = read_todo_file()
     
     return render_template('index.html', todo_list=todo_list, cache_bust=random.random())
 
@@ -18,26 +14,47 @@ def submit():
     form_values = request.form
     dict_form_values = dict(form_values)
     validations = run_validations(dict_form_values)
-    
+  
     if('Incorrect' in validations.values()):
-        return render_template_string(invalid_form_values(), form=validations)
+        return render_template_string(invalid_form_template(), form=validations)
+    
+    write_to_file(dict_form_values)
 
     return redirect(url_for('index'))
 
-def invalid_form_values():
+def write_to_file(form_values):
+    todo_list = read_todo_file()
+    append_value = [*todo_list, form_values]
+
+    with open('todo-list.json', 'w') as file:
+        json.dump(append_value, file)
+
+def read_todo_file():
+    try:
+        todo_list = json.loads(open('todo-list.json').read())
+
+    except IOError:
+        with open('todo-list.json', 'w') as file:
+            json.dump([], file)
+        
+        todo_list = json.loads(open('todo-list.json').read())
+
+    return todo_list 
+
+def invalid_form_template():
     return"""
     <h2>Please correct the following incorrect fields:</h2>
         <div>
             <span>Task:</span>
-            <span>{{form.task}}</span>
+            <span {% if form.task == 'Incorrect' %} style="color:red;" {% endif %}>{{form.task}}</span>
         </div>
         <div>
             <span>Email:</span>
-            <span>{{form.email}}</span>
+            <span {% if form.email == 'Incorrect' %} style="color:red;" {% endif %}>{{form.email}}</span>
         </div>
         <div>
             <span>Priority</span>
-            <span>{{form.priority}}</span>
+            <span {% if form.priority == 'Incorrect' %} style="color:red;" {% endif %}>{{form.priority}}</span>
         </div>
     """
 
