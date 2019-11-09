@@ -47,14 +47,17 @@
             <td>{{ todo.task }}</td>
             <td>{{ todo.email }}</td>
             <td>{{ todo.priority }}</td>
-            <td><button>Delete</button></td>
+            <td class="btn"> <a href="{{ url_for('delete', uuid=todo.uuid)}}" style="display:block;">Delete</a></td>
         </tr>
-        {% endfor %}  
+        {% endfor %}
     </table>
-    <form action="{{ url_for('clear')}}">
+    <form action="{{ url_for('clear')}}" method="POST">
         <button type="submit">Clear</button>
     </form>
-    
+    <form action="{{ url_for('save')}}" method="POST">
+        <button type="submit">Save</button>
+    </form>
     {% endif %}
 </body>
+
 </html>
