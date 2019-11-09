@@ -1,13 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, render_template_string
 import random, re, json, uuid
+from utilities import read_todo_file, run_validations, invalid_form_template, delete_todo_from_file
 
 app = Flask(__name__)
+todo_list = read_todo_file()
 
 @app.route('/')
 def index():
-    todo_list = read_todo_file()
-    
     return render_template('index.html', todo_list=todo_list, cache_bust=random.random())
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -19,65 +20,44 @@ def submit():
     if('Incorrect' in validations.values()):
         return render_template_string(invalid_form_template(), form=validations)
 
-    append_to_file({**dict_form_values, **uuid_dict})
+    todo_list.append({**dict_form_values, **uuid_dict})
 
     return redirect(url_for('index'))
 
-@app.route('/clear')
+
+@app.route('/clear', methods=['POST'])
 def clear():
     with open('todo-list.json', 'w') as file:
         json.dump([], file)
+    
+    todo_list.clear()
 
     return redirect(url_for('index'))
-    
 
-def append_to_file(form_values):
-    todo_list = read_todo_file()
-    append_value = [*todo_list, form_values]
 
+@app.route('/save', methods=['POST'])
+def save():
     with open('todo-list.json', 'w') as file:
-        json.dump(append_value, file)
+        json.dump(todo_list, file)
 
-def read_todo_file():
-    try:
-        todo_list = json.loads(open('todo-list.json').read())
+    return redirect(url_for('index'))
 
-    except IOError:
-        with open('todo-list.json', 'w') as file:
-            json.dump([], file)
-        
-        todo_list = json.loads(open('todo-list.json').read())
 
-    return todo_list 
+@app.route('/delete/<uuid>')
+def delete(uuid):
+    todo = None
 
-def invalid_form_template():
-    return"""
-    <h2>Please correct the following incorrect fields:</h2>
-        <div>
-            <span>Task:</span>
-            <span {% if form.task == 'Incorrect' %} style="color:red;" {% endif %}>{{form.task}}</span>
-        </div>
-        <div>
-            <span>Email:</span>
-            <span {% if form.email == 'Incorrect' %} style="color:red;" {% endif %}>{{form.email}}</span>
-        </div>
-        <div>
-            <span>Priority</span>
-            <span {% if form.priority == 'Incorrect' %} style="color:red;" {% endif %}>{{form.priority}}</span>
-        </div>
-    """
+    for todo_item in todo_list:
+        if todo_item['uuid'] == uuid:
+            todo = todo_item
 
-def validations_config():
-    return {
-        'task': lambda task: 'Correct' if task else 'Incorrect',
-        'email': lambda email: 'Correct' if re.search('^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$', email) else 'Incorrect',
-        'priority':  lambda p: 'Correct' if p.lower() == 'low' or p.lower() == 'hard' or p.lower() == 'medium' else 'Incorrect'
-    }    
+    if todo_item in todo_list:
+        todo_list.remove(todo_item)
 
-def run_validations(form_dict):
-    validations = validations_config()
+    delete_todo_from_file(todo)    
 
-    return dict([(k, validations[k](v)) for k, v in form_dict.items()])  
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run()
+    todo_list = read_todo_file()
