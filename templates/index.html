@@ -40,14 +40,14 @@
             <th>Task</th>
             <th>Email</th>
             <th>Priority</th>
-            <!-- <th>Mark Complete</th> -->
+            <th>Delete Todo</th>
         </tr>
         {% for todo in todo_list %}
         <tr>
             <td>{{ todo.task }}</td>
             <td>{{ todo.email }}</td>
             <td>{{ todo.priority }}</td>
-            <!-- <td><button>Complete</button></td> -->
+            <td><button>Delete</button></td>
         </tr>
         {% endfor %}  
     </table>
