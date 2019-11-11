@@ -35,3 +35,10 @@ a:hover {
     text-align: center;
 }
 
+.clear-save-buttons {
+    display: flex;
+}
+
+.clear-button {
+    padding-right: 30px;
+}
