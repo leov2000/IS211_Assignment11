@@ -20,13 +20,15 @@
                     <span>Email:</span>
                     <input type="text" name="email" required>
                 </div>
-
-                <select name="priority" required>
-                    <option value="">None</option>
-                    <option value="Low">Low</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Hard">Hard</option>
-                </select>
+                <div>
+                    <span>Priority:</span>
+                    <select name="priority" required>
+                        <option value="">None</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Hard">Hard</option>
+                    </select>
+                </div>
             </div>
             <button class='submit-button'>Add To Do Item</button>
         </form>
@@ -47,16 +49,18 @@
             <td>{{ todo.task }}</td>
             <td>{{ todo.email }}</td>
             <td>{{ todo.priority }}</td>
-            <td class="btn"> <a href="{{ url_for('delete', uuid=todo.uuid)}}" style="display:block;">Delete</a></td>
+            <td class="btn"> <a href="delete/{{todo.uuid}}" style="display:block;">Delete</a></td>
         </tr>
         {% endfor %}
     </table>
-    <form action="{{ url_for('clear')}}" method="POST">
-        <button type="submit">Clear</button>
-    </form>
-    <form action="{{ url_for('save')}}" method="POST">
-        <button type="submit">Save</button>
-    </form>
+    <div class="clear-save-buttons">
+        <form action="{{ url_for('clear')}}" method="POST" class="clear-button">
+            <button type="submit">Clear</button>
+        </form>
+        <form action="{{ url_for('save')}}" method="POST">
+            <button type="submit">Save</button>
+        </form>
+    </div>
     {% endif %}
 </body>
 
